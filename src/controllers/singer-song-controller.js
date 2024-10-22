@@ -23,3 +23,17 @@ exports.relationshipSingerAndSong = async (req, res, next) => {
     return res.status(500).json({ success: false, error });
   }
 };
+exports.getSingersAndSongsData = async (req, res, next) => {
+  const singer_id = parseInt(req.query.singer_id)
+  const song_id = parseInt(req.query.song_id)
+  const page = parseInt(req.query.page)
+  const limit = parseInt(req.query.limit)
+  try {
+    const result = await SingerSongServices.getSingersAndSongsData(singer_id, song_id, page, limit);
+    if (result) {
+      res.status(200).json({ success: true, message: 'Get data success', data: result });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message || error });
+  }
+}

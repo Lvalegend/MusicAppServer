@@ -18,8 +18,22 @@ exports.relationshipSongAndCategory = async (req, res, next) => {
         await SongCategoryServices.relationshipSongAndCategory(values);
       }
     }
-    return res.status(200).json({ success: true, message: 'Success'});
+    return res.status(200).json({ success: true, message: 'Success' });
   } catch (error) {
     return res.status(500).json({ success: false, error });
   }
 };
+exports.getSongsAndCategoriesData = async (req, res, next) => {
+  const song_id = parseInt(req.query.song_id)
+  const category_id = parseInt(req.query.category_id)
+  const page = parseInt(req.query.page)
+  const limit = parseInt(req.query.limit)
+  try {
+    const result = await SongCategoryServices.getSongsAndCategoriesData(song_id, category_id, page, limit)
+    if (result) {
+      res.status(200).json({ success: true, message: 'Get data success', data: result });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message || error });
+  }
+}

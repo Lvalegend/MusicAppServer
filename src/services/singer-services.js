@@ -3,7 +3,6 @@ const sql = require("../configs/database-config");
 class SingerServices {
   static saveSingerData(data, singer_avatar) {
     const { singer_name, date_of_birth, description, total_favourite } = data;
-
     return new Promise((resolve, reject) => {
       sql.query(
         "INSERT INTO `singer` (`singer_name`, `date_of_birth`, `total_favourite`, `singer_avatar`, `description`) VALUES (?, ?, ?, ?, ?)",

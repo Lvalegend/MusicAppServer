@@ -8,25 +8,33 @@ const pool = mysql.createPool({
   database:`${DB_NAME}`
 });
 
-
-async function paginate(tableName, page = null, limit = null, filter = '') {
+async function paginate(tableName, page, limit, filterColumn, filterValue) {
   try {
-    let query = `SELECT * FROM ${tableName} ${filter ? 'WHERE ' + filter : ''}`;
+    page = (page ?? 0) > 0 ? page : null;  
+    limit = (limit ?? 0) > 0 ? limit : null; 
+    filterColumn = filterColumn ?? '';
+    filterValue = filterValue ?? ''; 
+    
+    let query = `SELECT * FROM ${tableName}`;
     let totalItems = 0;
     let rows = [];
 
-    // Nếu có truyền page và limit, thực hiện phân trang
+    if (filterColumn && filterValue) {
+      query += ` WHERE ${filterColumn} LIKE ?`;
+      filterValue = `%${filterValue}%`;
+    }
+
     if (page && limit) {
       const offset = (page - 1) * limit;
 
       // Truy vấn tổng số bản ghi
-      const countQuery = `SELECT COUNT(*) AS totalItems FROM ${tableName} ${filter ? 'WHERE ' + filter : ''}`;
-      const [countRows] = await pool.query(countQuery);
+      const countQuery = `SELECT COUNT(*) AS totalItems FROM ${tableName} ${filterColumn && filterValue ? 'WHERE ' + filterColumn + ' LIKE ?' : ''}`;
+      const [countRows] = await pool.query(countQuery, filterColumn && filterValue ? [filterValue] : []);
       totalItems = countRows[0].totalItems;
 
       // Thêm điều kiện phân trang vào câu truy vấn
       query += ` LIMIT ? OFFSET ?`;
-      [rows] = await pool.query(query, [limit, offset]);
+      [rows] = await pool.query(query, filterColumn && filterValue ? [filterValue, limit, offset] : [limit, offset]);
 
       // Tính tổng số trang
       const totalPages = Math.ceil(totalItems / limit);
@@ -39,7 +47,7 @@ async function paginate(tableName, page = null, limit = null, filter = '') {
       };
     } else {
       // Nếu không có page và limit, lấy tất cả các bản ghi
-      [rows] = await pool.query(query);
+      [rows] = await pool.query(query, filterColumn && filterValue ? [filterValue] : []);
 
       return {
         data: rows,
@@ -47,9 +55,9 @@ async function paginate(tableName, page = null, limit = null, filter = '') {
       };
     }
   } catch (error) {
-
     console.log(error);
     throw new Error('Error fetching data: ' + error.message);
   }
 }
-module.exports = paginate
+
+module.exports = paginate;

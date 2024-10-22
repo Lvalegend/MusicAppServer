@@ -17,6 +17,7 @@ const userSingerRouter = require('./routes/user-singer-router');
 const userSongRouter = require('./routes/user-song-router');
 const songAlbumRouter = require('./routes/song-album-router');
 const singerAlbumRouter = require('./routes/singer-album-router');
+const streamFileRouter = require('./routes/stream-file-router');
 
 app.set('view engine', 'ejs');
 
@@ -25,6 +26,7 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.use(urlencodedParser)
 app.use(jsonParser)
 app.use(cors());
+
 
 app.use('/lvalegend', categoryRouter)
 app.use('/lvalegend', albumRouter)
@@ -40,6 +42,7 @@ app.use('/lvalegend', userRouter)
 app.use('/lvalegend', userAlbumRouter)
 app.use('/lvalegend', userSingerRouter)
 app.use('/lvalegend', userSongRouter)
+app.use('/lvalegend', streamFileRouter)
 
 
 
