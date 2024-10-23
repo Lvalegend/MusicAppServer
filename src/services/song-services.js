@@ -23,6 +23,24 @@ class SongServices {
       );
     });
   }
+  static deleteSong(song_id) {
+    return new Promise((resolve, reject) => {
+      sql.query(
+        "DELETE FROM `song` WHERE `song_id` = ?",
+        [song_id],
+        (err, res) => {
+          if (err) {
+            console.log(err);
+            return reject(err);
+          }
+          return resolve({
+            message: "Song deleted successfully",
+            song_id: song_id
+          });
+        }
+      );
+    });
+  }
 }
 
 module.exports = SongServices;

@@ -32,3 +32,14 @@ exports.getSongData = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err.message || err });
   }
 };
+
+exports.deleteSong = async (req, res, next) => {
+  const song_id = parseInt(req.query.song_id);
+  try {
+    const result = await SongServices.deleteSong(song_id);
+    return res.status(200).json({ success: true, message: 'Success', result: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message || err });
+  }
+};
+
