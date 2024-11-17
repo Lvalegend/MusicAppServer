@@ -3,6 +3,7 @@ const checkAdminPermissions = (req, res, next) => {
   const { role } = req.user;
 
   if (role === "admin") {
+    req.user = ''
     return next(); 
   }
   return res.status(403).json({ success: false, message: 'Không có quyền truy cập' });

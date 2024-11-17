@@ -20,6 +20,28 @@ class SingerAlbumServices {
       );
     });
   }
+
+  static deleteSingerAndAlbumRelationship(singer_id, album_id) {
+    return new Promise((resolve, reject) => {
+      sql.query(
+        "DELETE FROM `singer_album` WHERE `singer_id` = ? AND `album_id` = ?",
+        [singer_id, album_id],
+        (err, res) => {
+          if (err) {
+            console.log(err);
+            return reject(err);
+          }
+          return resolve({
+            message: "Singer And Album Relationship deleted successfully",
+            singer_id: singer_id,
+            album_id: album_id
+          });
+        }
+      );
+    });
+  }
+
+
   static getSingersAndAlbumsData(singer_id = null, album_id = null, page = null, limit = null) {
     return new Promise((resolve, reject) => {
       let query = `

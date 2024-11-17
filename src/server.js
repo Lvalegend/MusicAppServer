@@ -2,8 +2,9 @@ const http = require('http');
 const app = require('./app');
 const cors = require('cors');
 const chatSocketIo = require('./utilities/chat-io')
-const checkTokenSocket = require('./middlewares/check-token-socket')
 const { HOST_SERVER_NAME, PORT } = require('./configs/config-env');
+const injectSocketIo = require('./middlewares/inject-socket-io');
+const commentRouter = require('./routes/comment-router');
 
 const server = http.createServer(app);
 
@@ -19,7 +20,8 @@ const io = require('socket.io')(server, {
   }
 });
 
-io.use(checkTokenSocket)
+app.use(injectSocketIo(io));
+app.use('/lvalegend', commentRouter)
 chatSocketIo(io)
 
 server.listen(PORT, () => {

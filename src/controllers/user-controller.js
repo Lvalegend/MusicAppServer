@@ -3,6 +3,16 @@ const jwt = require('jsonwebtoken');
 const UserServices = require("../services/user-services");
 const paginate = require("../utilities/pagination");
 
+exports.deleteUser = async (req, res, next) => {
+  const { user_id } = req.user
+  try {
+    const result = await UserServices.deleteAccount(user_id);
+    return res.status(200).json({ success: true, message: 'Success', result: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message || err });
+  }
+}
+
 exports.registerAccount = async (req, res, next) => {
   const data = req.body;
 
@@ -62,15 +72,25 @@ exports.loginAccount = async (req, res, next) => {
   }
 };
 exports.getUserData = async (req, res, next) => {
+  const { user_id } = req.user
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
-  const filterColumn = req.query.filterColumn ? req.query.filterColumn.toString() : '';
-  const filterValue = req.query.filterValue ? req.query.filterValue.toString() : '';
+  let filterColumn = ''
+  let filterValue = ''
+  if (user_id) {
+    filterColumn = 'user_id'
+    filterValue = user_id
+  }
+  else {
+    filterColumn = req.query.filterColumn ? req.query.filterColumn.toString() : '';
+    filterValue = req.query.filterValue ? req.query.filterValue.toString() : '';
+  }
+  const isRandom = req.query.isRandom ? parseInt(req.query.isRandom) : '';
 
   try {
-    const response = await paginate('user', page, limit, filterColumn, filterValue);
+    const response = await paginate('user', page, limit, filterColumn, filterValue, isRandom);
     if (response) {
-      return res.status(200).json({ success: true, data: response });
+      return res.status(200).json({ success: true, result: response });
     }
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || err });

@@ -18,7 +18,9 @@ const userSongRouter = require('./routes/user-song-router');
 const songAlbumRouter = require('./routes/song-album-router');
 const singerAlbumRouter = require('./routes/singer-album-router');
 const streamFileRouter = require('./routes/stream-file-router');
-const commentRouter = require('./routes/comment-router');
+const downloadFileRouter = require('./routes/download-file-router');
+const searchRouter = require('./routes/search-router');
+const recentlyViewedRouter = require('./routes/recently-viewed-router');
 
 app.set('view engine', 'ejs');
 
@@ -44,7 +46,10 @@ app.use('/lvalegend', userAlbumRouter)
 app.use('/lvalegend', userSingerRouter)
 app.use('/lvalegend', userSongRouter)
 app.use('/lvalegend', streamFileRouter)
-app.use('/lvalegend', commentRouter)
+app.use('/lvalegend', downloadFileRouter)
+app.use('/lvalegend', searchRouter)
+app.use('/lvalegend', recentlyViewedRouter)
+
 
 
 

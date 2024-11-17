@@ -28,12 +28,25 @@ exports.getSingersAndSongsData = async (req, res, next) => {
   const song_id = parseInt(req.query.song_id)
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
+  const isRandom = req.query.isRandom ? parseInt(req.query.isRandom) : '';
+
   try {
-    const result = await SingerSongServices.getSingersAndSongsData(singer_id, song_id, page, limit);
+    const result = await SingerSongServices.getSingersAndSongsData(singer_id, song_id, page, limit, isRandom);
     if (result) {
       res.status(200).json({ success: true, message: 'Get data success', data: result });
     }
   } catch (error) {
     res.status(500).json({ success: false, error: error.message || error });
+  }
+}
+
+exports.deleteSingerAndSongsRelationship = async (req, res, next) => {
+  const singer_id = parseInt(req.query.singer_id);
+  const song_id = parseInt(req.query.song_id);
+  try {
+    const result = await SingerSongServices.deleteSingerSongRelationship(singer_id, song_id);
+    return res.status(200).json({ success: true, message: 'Success', result: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message || err });
   }
 }
