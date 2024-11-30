@@ -18,6 +18,19 @@ class CategoryServices {
       );
     });
   }
+  static async deleteCategory(category_id) {
+    try {
+        await sql.promise().query("DELETE FROM `song_category` WHERE `category_id` = ?", [category_id]);
+        await sql.promise().query("DELETE FROM `category` WHERE `category_id` = ?", [category_id]);
+        return {
+            message: "Category deleted successfully",
+            album_id: category_id
+        };
+    } catch (err) {
+        console.log(err);
+        throw new Error("Error deleting album");
+    }
+}
 }
 
 module.exports = CategoryServices;

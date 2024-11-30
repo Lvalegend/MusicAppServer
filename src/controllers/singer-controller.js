@@ -27,3 +27,12 @@ exports.getSingerData = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err.message || err });
   }
 };
+exports.deleteSinger = async (req,res,next) => {
+  const {singer_id} = req.body
+  try {
+   const result = await SingerServices.deleteSinger(singer_id)
+   return res.status(200).json({ success: true, message: 'Success', data: result });
+ } catch (err) {
+   return res.status(500).json({ success: false, error: err.message });
+ }
+}

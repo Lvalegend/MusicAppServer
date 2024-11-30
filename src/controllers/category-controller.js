@@ -26,3 +26,12 @@ exports.getCategoryData = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err.message || err });
   }
 };
+exports.deleteCategory = async (req, res, next) => {
+  const { category_id } = req.body
+  try {
+    const result = await CategoryServices.deleteCategory(category_id)
+    return res.status(200).json({ success: true, message: 'Success', data: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}

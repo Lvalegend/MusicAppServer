@@ -1,32 +1,75 @@
 const sql = require("../configs/database-config");
 
 class SongServices {
-  static saveSongData(data, song_image, song_url, status_data) {
-    const { song_name, release_date, total_view } = data;
+  // static saveSongData(data, song_image, song_url, status_data) {
+  //   const { song_name, release_date, total_view } = data;
+  //   const status = status_data;
+  //   const timestamp = Date.now();
+  //   const song_entity_id = `song-${timestamp}`;
+
+  //   return new Promise((resolve, reject) => {
+  //     sql.query(
+  //       "INSERT INTO `song` (`song_name`, `release_date`, `song_image`, `song_url`, `total_view`,`status`, `song_entity_id`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  //       [song_name, release_date, song_image, song_url, total_view, status, song_entity_id],
+  //       (err, res) => {
+  //         if (err) {
+  //           console.log(err);
+  //           return reject(err);
+  //         }
+  //         return resolve({
+  //           song_name: song_name,
+  //           release_date: release_date,
+  //           song_image: song_image,
+  //           song_url: song_url,
+  //           total_view: total_view,
+  //           song_entity_id: song_entity_id
+  //         });
+  //       }
+  //     );
+  //   });
+  // }
+  static async saveSongData(data, song_image, song_url, status_data) {
+    const { song_name, release_date, total_view, category_id, singer_id } = data;
     const status = status_data;
     const timestamp = Date.now();
     const song_entity_id = `song-${timestamp}`;
-    
-    return new Promise((resolve, reject) => {
-      sql.query(
-        "INSERT INTO `song` (`song_name`, `release_date`, `song_image`, `song_url`, `total_view`,`status`, `song_entity_id`) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [song_name, release_date, song_image, song_url, total_view, status, song_entity_id],
-        (err, res) => {
-          if (err) {
-            console.log(err);
-            return reject(err);
-          }
-          return resolve({
-            song_name: song_name,
-            release_date: release_date,
-            song_image: song_image,
-            song_url: song_url,
-            total_view: total_view,
-            song_entity_id: song_entity_id
-          });
-        }
+
+    try {
+      // Insert song into the `song` table
+      const [songInsertResult] = await sql.promise().query(
+        "INSERT INTO `song` (`song_name`, `release_date`, `song_image`, `song_url`, `total_view`, `status`, `song_entity_id`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [song_name, release_date, song_image, song_url, total_view, status, song_entity_id]
       );
-    });
+
+      const song_id = songInsertResult.insertId; // Get the newly inserted song_id
+
+      // Insert into `song_category`
+      await sql.promise().query(
+        "INSERT INTO `song_category` (`song_id`, `category_id`) VALUES (?, ?)",
+        [song_id, category_id]
+      );
+
+      // Insert into `singer_song`
+      await sql.promise().query(
+        "INSERT INTO `singer_song` (`singer_id`, `song_id`) VALUES (?, ?)",
+        [singer_id, song_id]
+      );
+
+      // Return the inserted song data
+      return {
+        song_id: songInsertResult.insertId,
+        song_name,
+        release_date,
+        song_image,
+        song_url,
+        total_view,
+        status,
+        song_entity_id
+      };
+    } catch (err) {
+      console.error("Error saving song data:", err);
+      throw new Error("Error saving song data to the database.");
+    }
   }
   static editSong(values, imageUpload, songFile) {
     return new Promise((resolve, reject) => {
@@ -90,26 +133,30 @@ class SongServices {
           resolve(res);
         }
       });
-      // sql.query(
-      //     "UPDATE `song` SET song_name = ?, release_date = ?, song_image = ?, song_url = ?, total_view = ?, status = ? WHERE song_id = ?",
-      //     [values.song_name, values.release_date, imageUpload, songFile, values.total_view, values.status,values.song_id],
-      //     (err, res) => {
-      //         if (err) {
-      //             console.log(err);
-      //             reject(err);
-      //         }
-      //         resolve({
-      //             song_id: values.song_id
-      //         });
-      //     }
-      // );
     });
   }
 
-  static deleteSong(song_id) {
+  static async deleteSong(song_id) {
+    try {
+      await sql.promise().query("DELETE FROM `user_song` WHERE `song_id` = ?", [song_id]);
+      await sql.promise().query("DELETE FROM `singer_song` WHERE `song_id` = ?", [song_id]);
+      await sql.promise().query("DELETE FROM `song_album` WHERE `song_id` = ?", [song_id]);
+      await sql.promise().query("DELETE FROM `song_category` WHERE `song_id` = ?", [song_id]);
+      await sql.promise().query("DELETE FROM `song_playlist` WHERE `song_id` = ?", [song_id]);
+      await sql.promise().query("DELETE FROM `song` WHERE `song_id` = ?", [song_id]);
+      return {
+        message: "Song deleted successfully",
+        album_id: song_id
+      };
+    } catch (err) {
+      console.log(err);
+      throw new Error("Error deleting song");
+    }
+  }
+  static updateSongView(song_id) {
     return new Promise((resolve, reject) => {
       sql.query(
-        "DELETE FROM `song` WHERE `song_id` = ?",
+        "UPDATE `song` SET `total_view` = `total_view` + 1 WHERE `song_id` = ?",
         [song_id],
         (err, res) => {
           if (err) {
@@ -118,24 +165,10 @@ class SongServices {
           }
           return resolve(res);
         }
-      );
-    });
+      )
+    })
   }
-  static updateSongView(song_id){
-     return new Promise((resolve, reject) => {
-       sql.query(
-         "UPDATE `song` SET `total_view` = `total_view` + 1 WHERE `song_id` = ?",
-         [song_id],
-         (err, res) => {
-          if (err) {
-            console.log(err);
-            return reject(err);
-          }
-          return resolve(res);
-        }
-       )  
-     })
-  }
+
 }
 
 module.exports = SongServices;

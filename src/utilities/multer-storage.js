@@ -13,13 +13,15 @@ const ensureDirectoryExistence = (dir) => {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath = 'src/uploads/';
-    
+    console.log('file:', file.mimetype)
     if (file.mimetype.startsWith('image')) {
       uploadPath += 'images/';
     } else if (file.mimetype.startsWith('video')) {
       uploadPath += 'videos/';
     } else if (file.mimetype === 'audio/mpeg') {
       uploadPath += 'audios/';
+    } else if (file.mimetype === 'audio/mp4') {
+      uploadPath += 'audios-m4a/'
     }
 
     ensureDirectoryExistence(uploadPath); // Đảm bảo thư mục tồn tại
@@ -35,15 +37,15 @@ const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
     // Cập nhật regex để kiểm tra file mp3
-    const filetypes = /jpeg|jpg|png|gif|mp4|mp3|avi|mkv/;
-    
-    const mimetype = file.mimetype === 'audio/mpeg' || filetypes.test(file.mimetype);
+    const filetypes = /jpeg|jpg|png|gif|mp4|mp3|avi|mkv|m4a/;
+
+    const mimetype = file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp4' || filetypes.test(file.mimetype);
     const extname = path.extname(file.originalname).toLowerCase();
 
     if (mimetype && filetypes.test(extname)) {
       return cb(null, true);
     } else {
-      cb(new Error('Chỉ cho phép tải lên các file ảnh, video và mp3!'));
+      cb(new Error('Chỉ cho phép tải lên các file ảnh, m4a và mp3!'));
     }
   }
 });

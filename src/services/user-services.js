@@ -122,6 +122,21 @@ class UserServices {
       });
     });
   }
+  static async deleteAccount(user_id) {
+    try {
+        await sql.promise().query("DELETE FROM `user_song` WHERE `user_id` = ?", [user_id]);
+        await sql.promise().query("DELETE FROM `user_album` WHERE `user_id` = ?", [user_id]);
+        await sql.promise().query("DELETE FROM `user_singer` WHERE `user_id` = ?", [user_id]);
+        await sql.promise().query("DELETE FROM `user` WHERE `user_id` = ?", [user_id]);
+        return {
+            message: "User deleted successfully",
+            album_id: user_id
+        };
+    } catch (err) {
+        console.log(err);
+        throw new Error("Error deleting user");
+    }
+}
 
 
 }

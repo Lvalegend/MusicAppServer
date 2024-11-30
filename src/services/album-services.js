@@ -122,23 +122,20 @@ class AlbumServices {
     });
   }
 
-  static deleteAlbum(album_id) {
-    return new Promise((resolve, reject) => {
-      sql.query(
-        "DELETE FROM `album` WHERE `album_id` = ?",
-        [album_id],
-        (err, res) => {
-          if (err) {
-            console.log(err);
-            return reject(err);
-          }
-          return resolve({
-            message: "Album deleted successfully",
-            song_id: album_id
-          });
-        }
-      );
-    });
+  static async deleteAlbum(album_id) {
+    try {
+      await sql.promise().query("DELETE FROM `singer_album` WHERE `album_id` = ?", [album_id]);
+      await sql.promise().query("DELETE FROM `song_album` WHERE `album_id` = ?", [album_id]);
+      await sql.promise().query("DELETE FROM `user_album` WHERE `album_id` = ?", [album_id]);
+      await sql.promise().query("DELETE FROM `album` WHERE `album_id` = ?", [album_id]);
+      return {
+        message: "Album deleted successfully",
+        album_id: album_id
+      };
+    } catch (err) {
+      console.log(err);
+      throw new Error("Error deleting album");
+    }
   }
 }
 

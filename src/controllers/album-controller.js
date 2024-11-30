@@ -27,3 +27,12 @@ exports.getAlbumData = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err.message || err });
   }
 };
+exports.deleteAlbum = async (req,res,next) => {
+   const {album_id} = parseInt(req.query.album_id)
+   try {
+    const result = await AlbumServices.deleteAlbum(album_id)
+    return res.status(200).json({ success: true, message: 'Success', data: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}

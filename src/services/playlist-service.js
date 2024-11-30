@@ -75,24 +75,19 @@ class PlaylistServices {
         });
     }
 
-    static deletePlaylist(playlist_id) {
-        return new Promise((resolve, reject) => {
-            sql.query(
-                "DELETE FROM `playlist` WHERE `playlist_id` = ?",
-                [playlist_id],
-                (err, res) => {
-                    if (err) {
-                        console.log(err);
-                        return reject(err);
-                    }
-                    return resolve({
-                        message: "Playlist deleted successfully",
-                        song_id: playlist_id
-                    });
-                }
-            );
-        });
-    }
+    static async deletePlaylist(playlist_id) {
+      try {
+          await sql.promise().query("DELETE FROM `song_playlist` WHERE `playlist_id` = ?", [playlist_id]);
+          await sql.promise().query("DELETE FROM `playlist` WHERE `playlist_id` = ?", [playlist_id]);
+          return {
+              message: "Playlist deleted successfully",
+              album_id: playlist_id
+          };
+      } catch (err) {
+          console.log(err);
+          throw new Error("Error deleting Playlist");
+      }
+  }
 
     static getUserPlaylistData(user_id, page, limit) {
       return new Promise((resolve, reject) => {

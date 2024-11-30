@@ -31,10 +31,9 @@ exports.getUserAndSongsData = async (req, res, next) => {
   const song_id = parseInt(req.query.song_id)
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
-  const isRandom = req.query.isRandom ? parseInt(req.query.isRandom) : '';
 
   try {
-    const result = await UserSongServices.getUserAndSongsData(song_id, user_id, page, limit, isRandom);
+    const result = await UserSongServices.getUserAndSongsData(song_id, user_id, page, limit);
     if (result) {
       res.status(200).json({ success: true, message: 'Get data success', data: result });
     }

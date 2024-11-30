@@ -13,3 +13,15 @@ exports.getSearchResult = async (req, res, next) => {
     res.status(500).json({ success: false, error: error.message || error });
   }
 }
+exports.getSpeechToTextData = async (req, res, next) => {
+  const {result} = req.text;
+  try {
+    const response = await SearchServices.getSpeechToTextData(result);
+    if (response || response === 0) {
+      console.log('response', response)
+      res.status(200).json({ success: true, message: 'Get data success', data: response });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message || error });
+  }
+}

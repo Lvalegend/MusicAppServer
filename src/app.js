@@ -21,6 +21,7 @@ const streamFileRouter = require('./routes/stream-file-router');
 const downloadFileRouter = require('./routes/download-file-router');
 const searchRouter = require('./routes/search-router');
 const recentlyViewedRouter = require('./routes/recently-viewed-router');
+const changeFileFormatRouter = require('./routes/change-file-format-router');
 
 app.set('view engine', 'ejs');
 
@@ -34,7 +35,7 @@ app.use(cors());
 app.use('/lvalegend', categoryRouter)
 app.use('/lvalegend', albumRouter)
 app.use('/lvalegend', playlistRouter)
-app.use('/lvalegend', songRouter)  
+app.use('/lvalegend', songRouter)
 app.use('/lvalegend', songCategoryRouter)
 app.use('/lvalegend', songPlaylistRouter)
 app.use('/lvalegend', songAlbumRouter)
@@ -49,7 +50,7 @@ app.use('/lvalegend', streamFileRouter)
 app.use('/lvalegend', downloadFileRouter)
 app.use('/lvalegend', searchRouter)
 app.use('/lvalegend', recentlyViewedRouter)
-
+app.use('/lvalegend', changeFileFormatRouter)
 
 
 

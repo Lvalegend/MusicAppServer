@@ -106,24 +106,20 @@ class SingerServices {
     });
   }
 
-  static deleteSinger(singer_id) {
-    return new Promise((resolve, reject) => {
-      sql.query(
-        "DELETE FROM `singer` WHERE `singer_id` = ?",
-        [singer_id],
-        (err, res) => {
-          if (err) {
-            console.log(err);
-            return reject(err);
-          }
-          return resolve({
+  static async deleteSinger(singer_id) {
+    try {
+        await sql.promise().query("DELETE FROM `singer_album` WHERE `singer_id` = ?", [singer_id]);
+        await sql.promise().query("DELETE FROM `singer_song` WHERE `singer_id` = ?", [singer_id]);
+        await sql.promise().query("DELETE FROM `singer` WHERE `singer_id` = ?", [singer_id]);
+        return {
             message: "Singer deleted successfully",
-            song_id: singer_id
-          });
-        }
-      );
-    });
-  }
+            album_id: singer_id
+        };
+    } catch (err) {
+        console.log(err);
+        throw new Error("Error deleting singer");
+    }
+}
 }
 
 module.exports = SingerServices;

@@ -7,4 +7,5 @@ const albumRouter = express.Router();
 albumRouter.post('/add/album', singleFile, addAlbum)
 albumRouter.get('/get/album-data', getAlbumData)
 
+
 module.exports = albumRouter

@@ -10,13 +10,30 @@ const server = http.createServer(app);
 
 
 app.use(cors({
-  origin: `http://${HOST_SERVER_NAME}:${PORT}`
+  origin: ['*'],
+  credentials: true,
 }));
 
 const io = require('socket.io')(server, {
   path: '/socket-io',
   cors: {
     origin: `http://${HOST_SERVER_NAME}:${PORT}`
+  }
+});
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,PATCH,PUT,POST,DELETE");
+  res.header("Access-Control-Expose-Headers", "Content-Length");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Accept, Authorization,x-auth-token, Content-Type, X-Requested-With, Range"
+  );
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  } else {
+    return next();
   }
 });
 
